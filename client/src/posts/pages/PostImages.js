@@ -1,7 +1,7 @@
 // import {storage} from "../../shared/util/storage-key"
 import React, { useState} from "react";
 import { useParams } from 'react-router-dom' 
-import { getDownloadURL, listAll, ref } from "firebase/storage";
+// import { getDownloadURL, listAll, ref } from "firebase/storage";
 import "../components/Image.css"
 
 import Button from "../../shared/components/FormElements/Button";

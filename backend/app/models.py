@@ -30,7 +30,7 @@ class User(db.Model):
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text)
-    image = db.Column(db.String(255))
+    image_url = db.Column(db.String(255))
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

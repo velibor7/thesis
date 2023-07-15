@@ -16,7 +16,7 @@ import { useAuth } from "./shared/hooks/auth-hook";
 
 import "./App.css";
 // import UpdateProfile from "./users/pages/UpdateProfile";
-// import AllPosts from "./posts/pages/AllPosts";
+import AllPosts from "./posts/pages/AllPosts";
 // import PostImages from "./posts/pages/PostImages";
 // import UploadImage from "./posts/pages/UploadImage";
 // import MyPost from "./posts/pages/MyPost";
@@ -42,14 +42,14 @@ const App = () => {
         <Routes>
           {/* <Route path="/profiles/:userId/" element={<UserProfile/>}/>
           <Route path="/profiles/:userId/update" element={<UpdateProfile/>}/> */}
-          <Route path="/auth" exact="true" element={<Auth />} />
-          {/* 
           <Route path="/" exact="true" element={<AllPosts />} />
+          <Route path="/auth" exact="true" element={<Auth />} />
+          <Route path="/newpost" element={<NewPost/>}/>
+          {/* 
           <Route path="/profiles" exact="true" element={<UserProfiles/>}/>
           <Route path="posts/:postId" element={<Post/>}/> 
           <Route path="posts/:userId" element={<UserPost/>}/>
           <Route path="my-posts" exact="true" element={<MyPost/>}/>
-          <Route path="posts/:id/new" element={<NewPost/>}/>
           <Route path="posts/update/:postId" element={<UpdatePost/>}/>
           <Route path="posts/images/:id/new" element={<UploadImage/>}/>
           <Route path="posts/images/:id" element={<PostImages/>}/> 

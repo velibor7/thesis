@@ -1,0 +1,10 @@
+.post-list {
+    list-style     : none;
+    margin      : 4rem auto;
+    display        : flex;
+    justify-content: center;
+    flex-wrap      : wrap;
+    padding        : 0;
+    width          : 100%;
+    /* max-width   : 40rem; */
+}

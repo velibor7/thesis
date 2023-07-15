@@ -12,7 +12,7 @@ const PostItemForList = (props) => {
     <>
       <div className="post__item">
         <Link to={`/posts/images/${props.item.id}`}>
-          <h4 className="profile__item__firstName">{props.item.title}</h4>
+          <h4 className="profile__item__firstName">{props.item.content}</h4>
         </Link>
         <div className="post__item__info">
           <p className="post__item__text">

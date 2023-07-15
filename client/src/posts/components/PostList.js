@@ -1,20 +1,21 @@
-import PostItem from "./PostItemForList";
 import React from "react";
+
+import PostItem from "./PostItem";
+import "./PostList.css";
 
 const PostList = (props) => {
   return (
-    <div className="posts">
-      <div className="post-list__container">
-      <h1>List of Posts</h1>
-        <div className="post__wrapper">
-          <div className="post-list__items">
-            {props.items?.map((item) => (
-              <PostItem item={item} key={item.id} />
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
+    <ul className="post-list">
+      {props.items?.map((post) => (
+        <PostItem
+          key={post.id}
+          id={post.id}
+          image_url={post.image_url}
+          content={post.content}
+          user_id={post.user_id}
+        />
+      ))}
+    </ul>
   );
 };
 

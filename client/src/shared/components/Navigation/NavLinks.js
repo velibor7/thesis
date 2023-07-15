@@ -30,6 +30,9 @@ const NavLinks = (props) => {
           <li>
             <NavLink to={"/my-posts"} exact="true">My Posts</NavLink>
           </li>
+          <li>
+            <NavLink to={"/newpost"} exact="true">New Post</NavLink>
+          </li>
           <li className="logout-btn">
             <button onClick={auth.logout}>LOGOUT</button>
           </li>

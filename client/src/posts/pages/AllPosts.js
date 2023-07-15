@@ -9,12 +9,13 @@ const AllPosts = () => {
     const fetchPosts = async () => {
       try {
         fetch(
-          `http://localhost:5000/posts`,
+          `http://localhost:8000/posts`,
           { method: "get", dataType: "json"}
         )
           .then((response) => response.json())
           .then((data) => {
-            setLoadedPosts(data["posts"]);
+            console.log(data)
+            setLoadedPosts(data);
           });
       } catch (err) {
         console.log("error happend")
@@ -26,7 +27,7 @@ const AllPosts = () => {
 
   return (
     <>
-        <PostList items={loadedPosts}></PostList>
+        <PostList items={loadedPosts} />
     </>
   );
 };

@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from flask import redirect, url_for, request, jsonify
 from app import app, db
 from app.models import User, Post, Like, Follow
+from werkzeug.utils import secure_filename
 from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, \
                                unset_jwt_cookies, jwt_required, JWTManager
 from flask_bcrypt import generate_password_hash, check_password_hash
@@ -18,6 +19,7 @@ jwt = JWTManager(app)
 
 
 @app.route('/')
+@cross_origin()
 def home():
     # Logic to fetch and display posts on the home page
     posts = Post.query.all()
@@ -31,18 +33,55 @@ def profile(username):
         return redirect(url_for('home'))
     return user.json()
 
-@app.route('/upload', methods=['GET', 'POST'])
-@jwt_required()
-def upload():
-    # Logic to handle image upload form submission
-    if request.method == 'POST':
-        # Handle the uploaded image and save it to the storage service (e.g., Amazon S3)
-        # Retrieve the image URL or path and store it in the database
-        # Create a new post entry for the user
+@app.route('/posts', methods=['GET'])
+@cross_origin()
+def get_all_posts():
+    posts = Post.query.all()
+    post_list = []
 
-        return redirect(url_for('home'))
-    
-    return {}  # render_template('upload.html')
+    for post in posts:
+        post_data = {
+            'id': post.id,
+            'content': post.content,
+            # 'image_url': post.image_url,
+            'image_url': url_for('static', filename=post.image_url),
+            'user_id': post.user_id
+        }
+        post_list.append(post_data)
+    print("post list: ")
+    print(post_list)
+
+    return jsonify(post_list)
+
+@app.route('/posts', methods=['POST'])
+@cross_origin()
+@jwt_required()  # Requires authentication
+def create_post():
+    # Get the data from the request
+    content = request.form.get('content')
+    user_id = request.form.get('user_id')
+    image_file = request.files.get('image')
+    print(request.content_type)
+    print("user_id ", request.form.get('user_id'))
+    print("content ", request.form.get('content'))
+    print(request.files.get('image'))
+
+    # Check if an image file was provided
+    if image_file is None:
+        return jsonify({'message': 'No image file provided'}), 400
+
+    # Securely save the uploaded file
+    filename = secure_filename(image_file.filename)
+    image_path = 'app/static/uploads/' + filename
+    print(image_path)
+    image_file.save(image_path)
+
+    # Create a new post record
+    new_post = Post(content=content, image_url=image_path, user_id=user_id)
+    db.session.add(new_post)
+    db.session.commit()
+
+    return jsonify({'message': 'Post created successfully'}), 201
 
 @app.route('/token', methods=["POST"])
 @cross_origin()
@@ -60,6 +99,7 @@ def create_token():
 
 
 @app.route('/login', methods=['POST'])
+@cross_origin()
 def login():
     username = request.json.get('username')
     password = request.json.get('password')
@@ -78,6 +118,7 @@ def login():
         return jsonify({'message': 'Invalid username or password'}), 401
 
 @app.route("/logout", methods=["POST"])
+@cross_origin()
 def logout():
     response = jsonify({"msg": "logout successful"})
     unset_jwt_cookies(response)
@@ -102,6 +143,7 @@ def refresh_expiring_jwts(response):
         return response
 
 @app.route('/register', methods=['POST'])
+@cross_origin()
 def register():
     username = request.json.get('username')
     password = request.json.get('password')
