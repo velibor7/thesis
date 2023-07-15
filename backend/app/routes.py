@@ -6,7 +6,8 @@ from app import app, db
 from app.models import User, Post, Like, Follow
 from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, \
                                unset_jwt_cookies, jwt_required, JWTManager
-from flask_bcrypt import generate_password_hash
+from flask_bcrypt import generate_password_hash, check_password_hash
+from flask_cors import cross_origin
 
 
 
@@ -44,15 +45,37 @@ def upload():
     return {}  # render_template('upload.html')
 
 @app.route('/token', methods=["POST"])
+@cross_origin()
 def create_token():
-    email = request.json.get("email", None)
+    username = request.json.get("username", None)
     password = request.json.get("password", None)
-    if email != "test" or password != "test":
+    print(username)
+    print(password)
+    if username != "test" or password != "test123":
         return {"msg": "Wrong email or password"}, 401
 
-    access_token = create_access_token(identity=email)
-    response = {"access_token":access_token}
+    access_token = create_access_token(identity=username)
+    response = {"userId": 1, "token": access_token}
     return response
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.json.get('username')
+    password = request.json.get('password')
+
+    # Retrieve the user from the database based on the provided username
+    user = User.query.filter_by(username=username).first()
+
+    if user and check_password_hash(user.password_hash, password):
+        # If the provided password matches the stored hash, generate an access token
+        access_token = create_access_token(identity=user.username)
+
+        # Return the access token as the response
+        return jsonify({'access_token': access_token}), 200
+    else:
+        # If the credentials are invalid, return an error message
+        return jsonify({'message': 'Invalid username or password'}), 401
 
 @app.route("/logout", methods=["POST"])
 def logout():
@@ -77,7 +100,7 @@ def refresh_expiring_jwts(response):
     except (RuntimeError, KeyError):
         # Case where there is not a valid JWT. Just return the original respone
         return response
-    
+
 @app.route('/register', methods=['POST'])
 def register():
     username = request.json.get('username')
@@ -85,17 +108,20 @@ def register():
     email = request.json.get('email')
 
     # Check if the username or email already exists in the database
-    if User.query.filter_by(username=username).first() is not None:
-        return jsonify({'message': 'Username already exists'}), 409
-    if User.query.filter_by(email=email).first() is not None:
-        return jsonify({'message': 'Email already exists'}), 409
+    existing_user = User.query.filter(
+        (User.username == username) | (User.email == email)
+    ).first()
 
-    # Hash the password
-    password_hash = generate_password_hash(password)
+    if existing_user:
+        if existing_user.username == username:
+            return jsonify({'message': 'Username already exists'}), 409
+        else:
+            return jsonify({'message': 'Email already exists'}), 409
 
     # Create a new user record
-    user = User(username=username, password_hash=password_hash, email=email)
-    db.session.add(user)
+    password_hash = generate_password_hash(password)
+    new_user = User(username=username, password_hash=password_hash, email=email)
+    db.session.add(new_user)
     db.session.commit()
 
     return jsonify({'message': 'User registered successfully'}), 201

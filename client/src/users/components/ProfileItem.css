@@ -1,0 +1,31 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+* {
+  box-sizing: border-box;
+}
+
+.profile__container {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.profile__item {
+  margin: 10px;
+  padding: 1em;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+  width: 300px;
+}
+
+.profile__item p {
+    font-size: 13px;
+    /* margin: 0 0 40px; */
+}
+
+.map-container {
+    height: 15rem;
+    width : 100%;
+}

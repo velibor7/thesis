@@ -1,0 +1,17 @@
+.my-profile__item {
+    width: 25em;
+}
+
+.profile-list__container {
+    display: flex;
+    margin: auto;
+    width: 80%;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .profile-list__items {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+  }

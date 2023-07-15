@@ -1,0 +1,41 @@
+/* .PostImages {
+    width: 100vw;
+    height: auto;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+} */
+
+.image__container {
+    display: flex;
+    margin: auto;
+    width: 80%;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.image__items {
+    margin: 5em;
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+img {
+    width: 20em;
+    height: 20em;
+}
+
+.uploadImage {
+    margin: 5em;
+    padding: 3em;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+    width: 410px;
+}
+
+.button--load {
+    margin-top: 5rem;
+    margin-left: 5rem;
+}
