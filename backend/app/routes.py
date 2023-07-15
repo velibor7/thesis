@@ -43,40 +43,32 @@ def get_all_posts():
         post_data = {
             'id': post.id,
             'content': post.content,
-            # 'image_url': post.image_url,
-            'image_url': url_for('static', filename=post.image_url),
+            'image_url': post.image_url,
+            # 'image_url': url_for('static', filename=post.image_url),
             'user_id': post.user_id
         }
         post_list.append(post_data)
-    print("post list: ")
-    print(post_list)
+        print(f"post id: {post.id}; image_url: {post.image_url}")
 
     return jsonify(post_list)
 
 @app.route('/posts', methods=['POST'])
 @cross_origin()
-@jwt_required()  # Requires authentication
+@jwt_required()
 def create_post():
-    # Get the data from the request
     content = request.form.get('content')
     user_id = request.form.get('user_id')
     image_file = request.files.get('image')
-    print(request.content_type)
-    print("user_id ", request.form.get('user_id'))
-    print("content ", request.form.get('content'))
-    print(request.files.get('image'))
 
-    # Check if an image file was provided
     if image_file is None:
         return jsonify({'message': 'No image file provided'}), 400
 
     # Securely save the uploaded file
     filename = secure_filename(image_file.filename)
-    image_path = 'app/static/uploads/' + filename
-    print(image_path)
-    image_file.save(image_path)
+    image_path = 'static/uploads/' + filename
+    print("image_path when saving: " + image_path)
+    image_file.save('app/' + image_path)
 
-    # Create a new post record
     new_post = Post(content=content, image_url=image_path, user_id=user_id)
     db.session.add(new_post)
     db.session.commit()
