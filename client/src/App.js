@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, BrowserRouter as Router, Route } from "react-router-dom";
 
 // import UserProfile from "./users/pages/Profile";
-// import UserProfiles from "./users/pages/AllProfiles";
+import AllProfiles from "./users/pages/AllProfiles";
 
 // import Post from "./posts/pages/Post"
 
@@ -45,8 +45,8 @@ const App = () => {
           <Route path="/" exact="true" element={<AllPosts />} />
           <Route path="/auth" exact="true" element={<Auth />} />
           <Route path="/newpost" element={<NewPost/>}/>
+          <Route path="/profiles" exact="true" element={<AllProfiles/>}/>
           {/* 
-          <Route path="/profiles" exact="true" element={<UserProfiles/>}/>
           <Route path="posts/:postId" element={<Post/>}/> 
           <Route path="posts/:userId" element={<UserPost/>}/>
           <Route path="my-posts" exact="true" element={<MyPost/>}/>

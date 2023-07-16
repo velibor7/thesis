@@ -7,6 +7,7 @@ from flask_bcrypt import generate_password_hash, check_password_hash
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
+    full_name = db.Column(db.String(120))
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
     profile_picture = db.Column(db.String(255))
@@ -19,10 +20,12 @@ class User(db.Model):
     following = db.relationship('Follow', foreign_keys='Follow.follower_id', backref='follower', lazy='dynamic',
                                 cascade='all, delete-orphan')
 
-    def __init__(self, username, password, email):
+    def __init__(self, full_name, username, password, email, bio):
         self.username = username
+        self.full_name = full_name
         self.email = email
         self.password_hash = generate_password_hash(password)
+        self.bio = bio
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)

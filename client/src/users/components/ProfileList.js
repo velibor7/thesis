@@ -1,5 +1,7 @@
-import ProfileItem from "./ProfileItemForList";
+import ProfileItemForList from "./ProfileItemForList";
 import React from "react";
+
+import './ProfileList.css'
 
 const ProfileList = (props) => {
   return (
@@ -9,7 +11,7 @@ const ProfileList = (props) => {
         <div className="profile__wrapper">
           <div className="profile-list__items">
             {props.items?.map((item) => (
-              <ProfileItem item={item} key={item.id} />
+              <ProfileItemForList item={item} key={item.id} currentUser={props.currentUser}/>
             ))}
           </div>
         </div>

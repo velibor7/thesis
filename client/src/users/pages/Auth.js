@@ -20,9 +20,9 @@ const Auth = (props) => {
   const auth = useContext(AuthContext);
   const [isLoginMode, setIsLoginMode] = useState(true);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
-  
+
   const navigate = useNavigate();
-  
+
   const [formState, inputHandler, setFormData] = useForm(
     {
       username: {
@@ -67,8 +67,8 @@ const Auth = (props) => {
     if (isLoginMode) {
       try {
         const responseData = await sendRequest(
-          // "http://localhost:8000/auth/login",
-          "http://localhost:8000/token",
+          "http://localhost:8000/login",
+          // "http://localhost:8000/token",
           "POST",
           JSON.stringify({
             username: formState.inputs.username.value,
@@ -78,50 +78,80 @@ const Auth = (props) => {
             "Content-Type": "application/json",
           }
         );
+
         console.log("responseData: " + responseData);
+
         auth.login(responseData.userId, responseData.token);
-        console.log(responseData.token);
-        navigate("/")
-        if (auth.isLoggedIn){
+        navigate("/");
+
+        if (auth.isLoggedIn) {
           navigate("/");
         }
-      } catch (err) {}
+      } catch (err) {
+        console.error(err);
+      }
     } else {
       try {
         const responseData = await sendRequest(
-          "http://localhost:8000/auth/register",
+          "http://localhost:8000/register",
           "POST",
           JSON.stringify({
-            firstName: formState.inputs.name.value,
             username: formState.inputs.username.value,
             password: formState.inputs.password.value,
-          })
-        );
-
-        auth.login(responseData.userId, responseData.token);
-        navigate("/")
+            full_name: formState.inputs.full_name.value,
+            bio: formState.inputs.bio.value,
+            email: formState.inputs.email.value,
+          }),
+          {
+            "Content-Type": "application/json",
+          }
+        ).then((res) => {
+          console.log("responseData: " + responseData.message);
+          // setIsLoginMode(true)
+          navigate("/auth");
+        });
       } catch (err) {}
     }
   };
 
   return (
     <>
-      <ErrorModal error={error} onClear={clearError} />
+      {/* <ErrorModal error={error} onClear={clearError} /> */}
       <Card className="auth">
         <h2>Login Required</h2>
         <hr />
         <form onSubmit={authSubmitHandler}>
           {isLoading && <Spinner asOverlay />}
           {!isLoginMode && (
-            <Input
-              element="input"
-              id="name"
-              type="text"
-              label="Your Name"
-              validators={[VALIDATOR_REQUIRE()]}
-              errorText="Please enter a name."
-              onInput={inputHandler}
-            />
+            <>
+              <Input
+                element="input"
+                id="full_name"
+                type="text"
+                label="Your Full Name"
+                validators={[VALIDATOR_REQUIRE()]}
+                errorText="Please enter a full name."
+                onInput={inputHandler}
+              />
+              <Input
+                element="input"
+                id="email"
+                type="text"
+                label="Email"
+                validators={[VALIDATOR_REQUIRE()]}
+                errorText="Please enter an email."
+                onInput={inputHandler}
+              />
+              <Input
+                element="textarea"
+                id="bio"
+                type="text"
+                label="Enter a short bio"
+                validators={[VALIDATOR_REQUIRE()]}
+                errorText="Please enter a bio."
+                onInput={inputHandler}
+              />
+            </>
           )}
           <Input
             element="input"

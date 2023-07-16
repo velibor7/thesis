@@ -58,7 +58,7 @@ const ProfileItem = (props) => {
           </p>
           
         </div>
-        <div className="cocktail-item__actions">
+        <div className="profile-item__actions">
           {
             (auth.userId === id) &&
             (<Button info onClick={UpdateProfile}>
