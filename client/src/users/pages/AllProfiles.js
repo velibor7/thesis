@@ -51,7 +51,8 @@ const AllProfiles = () => {
             console.log(data);
             setCurrentUser(data);
             setCurrentUserFollowing(data.following_ids);
-            console.log("currentUserFollowing: " + currentUserFollowing)
+            console.log("currentUserFollowing: ")
+            console.log(currentUserFollowing)
           });
       } catch (err) {
         console.log("error happend");

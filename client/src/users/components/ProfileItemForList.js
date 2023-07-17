@@ -95,10 +95,9 @@ const ProfileItemForList = (props) => {
             Following: {props.item.following_count}
           </p>
         </div>
-        <div>{props.currentUserFollowing}</div>
         {auth.userId && (
           <div className="profile-item__actions">
-            {/* {auth && followingIds.includes(props?.item.id) ? ( */}
+            {/* {!followingIds.includes(props?.item.id) ? ( */}
             {!props?.currentUserFollowing.includes(props?.item.id) ? (
               <Button info onClick={() => followUser(props.item.id)}>
                 Follow

@@ -16,7 +16,6 @@ const ProfileList = (props) => {
           </div>
         </div>
       </div>
-      <div>{props.currentUserFollowing}</div>
     </div>
   );
 };

@@ -10,6 +10,8 @@ from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, \
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_cors import cross_origin
 
+from util.push_to_s3 import push_image_to_s3
+
 
 
 app.config["JWT_SECRET_KEY"] = "please-remember-to-change-me"
@@ -76,7 +78,7 @@ def get_user(user_id):
     user = User.query.get_or_404(user_id)
 
     follower_ids = [follower.follower_id for follower in user.followers]
-    following_ids = [follower.follower_id for follower in user.following]
+    following_ids = [follower.followed_id for follower in user.following]
 
     user_data = {
         'id': user.id,
@@ -200,6 +202,10 @@ def create_post():
 
     # Securely save the uploaded file
     filename = secure_filename(image_file.filename)
+
+    # ! pushing image to s3
+    push_image_to_s3(user_id, image_file, filename)
+
     image_path = 'static/uploads/' + filename
     print("image_path when saving: " + image_path)
     image_file.save('app/' + image_path)
