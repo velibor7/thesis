@@ -10,7 +10,7 @@ from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, \
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_cors import cross_origin
 
-from util.push_to_s3 import push_image_to_s3
+# from util.push_to_s3 import push_image_to_s3
 
 
 
@@ -204,7 +204,7 @@ def create_post():
     filename = secure_filename(image_file.filename)
 
     # ! pushing image to s3
-    push_image_to_s3(user_id, image_file, filename)
+    # push_image_to_s3(user_id, image_file, filename)
 
     image_path = 'static/uploads/' + filename
     print("image_path when saving: " + image_path)
