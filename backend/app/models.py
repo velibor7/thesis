@@ -14,7 +14,7 @@ class User(db.Model):
     bio = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    posts = db.relationship('Post', backref='user', lazy=True)
+    posts = db.relationship('Post', backref='author', lazy=True)
     followers = db.relationship('Follow', foreign_keys='Follow.followed_id', backref='followed', lazy='dynamic',
                                 cascade='all, delete-orphan')
     following = db.relationship('Follow', foreign_keys='Follow.follower_id', backref='follower', lazy='dynamic',

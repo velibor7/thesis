@@ -11,11 +11,12 @@ const ProfileList = (props) => {
         <div className="profile__wrapper">
           <div className="profile-list__items">
             {props.items?.map((item) => (
-              <ProfileItemForList item={item} key={item.id} currentUser={props.currentUser}/>
+              <ProfileItemForList item={item} key={item.id} currentUser={props.currentUser} currentUserFollowing={props.currentUserFollowing}/>
             ))}
           </div>
         </div>
       </div>
+      <div>{props.currentUserFollowing}</div>
     </div>
   );
 };

@@ -91,6 +91,7 @@ const Auth = (props) => {
         console.error(err);
       }
     } else {
+      console.log(formState.isValid)
       try {
         const responseData = await sendRequest(
           "http://localhost:8000/register",
@@ -118,8 +119,8 @@ const Auth = (props) => {
     <>
       {/* <ErrorModal error={error} onClear={clearError} /> */}
       <Card className="auth">
-        <h2>Login Required</h2>
-        <hr />
+        {/* <h2>Login Required</h2>
+        <hr /> */}
         <form onSubmit={authSubmitHandler}>
           {isLoading && <Spinner asOverlay />}
           {!isLoginMode && (
@@ -173,7 +174,7 @@ const Auth = (props) => {
           />
           <Button
             type="submit"
-            disabled={!formState.isValid}
+            // disabled={!formState.isValid}
             className="center-btn"
           >
             {isLoginMode ? "LOGIN" : "SIGNUP"}

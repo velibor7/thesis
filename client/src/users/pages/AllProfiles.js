@@ -7,6 +7,7 @@ const AllProfiles = () => {
   const auth = useContext(AuthContext);
   const [loadedProfiles, setLoadedProfiles] = useState();
   const [currentUser, setCurrentUser] = useState({});
+  const [currentUserFollowing, setCurrentUserFollowing] = useState([]);
 
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -21,6 +22,9 @@ const AllProfiles = () => {
             var profiles = [];
             for (var i = 0; i < data.length; i++) {
               var profile = data[i];
+              if (profile.id == auth.userId) {
+                continue;
+              }
               profiles.push(profile);
             }
             setLoadedProfiles(profiles);
@@ -46,6 +50,8 @@ const AllProfiles = () => {
           .then((data) => {
             console.log(data);
             setCurrentUser(data);
+            setCurrentUserFollowing(data.following_ids);
+            console.log("currentUserFollowing: " + currentUserFollowing)
           });
       } catch (err) {
         console.log("error happend");
@@ -57,7 +63,7 @@ const AllProfiles = () => {
 
   return (
     <>
-      <ProfileList items={loadedProfiles} currentUser={currentUser}/>
+      <ProfileList items={loadedProfiles} currentUser={currentUser} currentUserFollowing={currentUserFollowing}/>
     </>
   );
 };

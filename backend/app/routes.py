@@ -85,7 +85,7 @@ def get_user(user_id):
         'profile_picture': user.profile_picture,
         'bio': user.bio,
         'created_at': user.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-        'post_count': user.posts.count(),
+        'post_count': len(user.posts),  # user.posts.count(),
         'follower_count': user.followers.count(),
         'following_count': user.following.count(),
         'follower_ids': follower_ids,
@@ -102,6 +102,7 @@ def get_all_users():
 
     for user in users:
         follower_ids = [follower.follower_id for follower in user.followers]
+        following_ids = [follower.follower_id for follower in user.following]
         user_data = {
             'id': user.id,
             'username': user.username,
@@ -109,10 +110,11 @@ def get_all_users():
             # 'profile_picture': user.profile_picture,
             'bio': user.bio,
             'created_at': user.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-            'post_count': user.posts.count(),
+            'post_count': len(user.posts),  # user.posts.count(),
             'follower_count': user.followers.count(),
             'following_count': user.following.count(),
-            'follower_ids': follower_ids
+            'follower_ids': follower_ids,
+            'following_ids': following_ids
         }
         user_list.append(user_data)
 
@@ -163,8 +165,8 @@ def get_all_users():
         }
     ]
 
-    return jsonify(dumb_data)
-    # return jsonify(user_list)
+    # return jsonify(dumb_data)
+    return jsonify(user_list)
 
 @app.route('/posts', methods=['GET'])
 @cross_origin()
@@ -207,6 +209,46 @@ def create_post():
     db.session.commit()
 
     return jsonify({'message': 'Post created successfully'}), 201
+
+@app.route('/users/<int:current_user_id>/<int:user_to_follow_id>/follow', methods=['POST'])
+@cross_origin()
+def follow_user(current_user_id, user_to_follow_id):
+    user_to_follow = User.query.get_or_404(user_to_follow_id)
+    current_user = User.query.get_or_404(current_user_id)
+
+    if current_user_id == user_to_follow_id:
+        return jsonify({'message': 'Cannot follow yourself'})
+
+    # Check if the current user is already following the target user
+    existing_follow = Follow.query.filter_by(follower_id=current_user_id, followed_id=user_to_follow_id).first()
+
+    if existing_follow:
+        return jsonify({'message': 'Already following this user'})
+
+    follow = Follow(follower_id=current_user_id, followed_id=user_to_follow_id)
+    db.session.add(follow)
+    db.session.commit()
+
+    return jsonify({'message': 'Successfully followed user'})
+
+@app.route('/users/<int:current_user_id>/<int:user_to_unfollow_id>/unfollow', methods=['POST'])
+@cross_origin()
+def unfollow_user(current_user_id, user_to_unfollow_id):
+    user_to_unfollow = User.query.get_or_404(user_to_unfollow_id)
+    current_user = User.query.get_or_404(current_user_id)
+
+    if current_user_id == user_to_unfollow_id:
+        return jsonify({'message': 'Cannot unfollow yourself'})
+
+    follow = Follow.query.filter_by(follower_id=current_user_id, followed_id=user_to_unfollow_id).first()
+
+    if not follow:
+        return jsonify({'message': 'Not following this user'})
+
+    db.session.delete(follow)
+    db.session.commit()
+
+    return jsonify({'message': 'Successfully unfollowed user'})
 
 @app.route('/token', methods=["POST"])
 @cross_origin()
