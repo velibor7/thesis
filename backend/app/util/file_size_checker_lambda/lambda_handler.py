@@ -11,6 +11,8 @@ def lambda_handler(event, context):
     bucket = event['Records'][0]['s3']['bucket']['name']
     key = event['Records'][0]['s3']['object']['key']
 
+    out_bucket = 'xws-thesis-out'
+
     # Get the size of the uploaded file
     response = s3_client.head_object(Bucket=bucket, Key=key)
     file_size = response['ContentLength']
@@ -28,14 +30,14 @@ def lambda_handler(event, context):
 
         # Push the compressed image to the outBucket
         with open("compressed_image.jpg", "rb") as f:
-            s3_client.upload_fileobj(f, 'outBucket', key)
+            s3_client.upload_fileobj(f, out_bucket, key)
 
         # Delete the temporary compressed image file
         os.remove("compressed_image.jpg")
     else:
         # Push the file to the outBucket
         s3_client.copy_object(
-            Bucket='outBucket',
+            Bucket=out_bucket,
             CopySource={'Bucket': bucket, 'Key': key},
             Key=key
         )
