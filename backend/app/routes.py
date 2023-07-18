@@ -216,6 +216,18 @@ def create_post():
 
     return jsonify({'message': 'Post created successfully'}), 201
 
+@app.route('/users/<int:user_id>/followers', methods=['GET'])
+@cross_origin()
+def get_followers(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    followers = Follow.query.filter_by(followed_id=user_id).all()
+    follower_info = [{'id': follower.follower_id, 'username': follower.username, 'email': follower.email} for follower in followers]
+
+    return jsonify({'followers': follower_info})
+
 @app.route('/users/<int:current_user_id>/<int:user_to_follow_id>/follow', methods=['POST'])
 @cross_origin()
 def follow_user(current_user_id, user_to_follow_id):
