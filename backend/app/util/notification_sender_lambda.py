@@ -29,7 +29,7 @@ def lambda_handler(event, context):
     }
 
 def get_followers(user_id):
-    ngrok_forwarding_url = 'CHANGE_THIS'
+    ngrok_forwarding_url = 'a8e7-94-230-187-74.ngrok-free.app'
     ngrok_url = f'http://{ngrok_forwarding_url}/users/{user_id}/followers'
 
     # Send a GET request to the Flask endpoint using the ngrok URL
@@ -37,6 +37,7 @@ def get_followers(user_id):
 
     if response.status_code == 200:
         followers = json.loads(response.text)['followers']
+        print(followers)
     else:
         # Handle the error response if needed
         print('error happend')
