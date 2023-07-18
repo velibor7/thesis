@@ -10,7 +10,7 @@ from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, \
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_cors import cross_origin
 
-# from util.push_to_s3 import push_image_to_s3
+from .util.push_to_s3 import push_image_to_s3, push_image_to_s3_with_path
 
 
 
@@ -200,15 +200,15 @@ def create_post():
     if image_file is None:
         return jsonify({'message': 'No image file provided'}), 400
 
-    # Securely save the uploaded file
+    # Securely save the uploaded file locally
     filename = secure_filename(image_file.filename)
-
-    # ! pushing image to s3
-    # push_image_to_s3(user_id, image_file, filename)
 
     image_path = 'static/uploads/' + filename
     print("image_path when saving: " + image_path)
     image_file.save('app/' + image_path)
+
+    # ! pushing image to s3 after it is saved
+    push_image_to_s3_with_path(user_id, f'app/{image_path}', filename)
 
     new_post = Post(content=content, image_url=image_path, user_id=user_id)
     db.session.add(new_post)
