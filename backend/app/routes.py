@@ -222,11 +222,27 @@ def get_followers(user_id):
     user = User.query.get(user_id)
     if not user:
         return jsonify({'error': 'User not found'}), 404
-
+        
+    # Get all Follow entries where the followed_id is the given user_id
     followers = Follow.query.filter_by(followed_id=user_id).all()
-    follower_info = [{'id': follower.follower_id, 'username': follower.username, 'email': follower.email} for follower in followers]
 
-    return jsonify({'followers': follower_info})
+    # Get the follower IDs from the retrieved Follow entries
+    follower_ids = [follower.follower_id for follower in followers]
+
+    # Query the User table to get the follower information using the follower IDs
+    follower_info = User.query.filter(User.id.in_(follower_ids)).all()
+
+    # Prepare the response data
+    response_data = [
+        {
+            'id': follower.id,
+            'username': follower.username,
+            'email': follower.email
+        }
+        for follower in follower_info
+    ]
+
+    return jsonify({'followers': response_data})
 
 @app.route('/users/<int:current_user_id>/<int:user_to_follow_id>/follow', methods=['POST'])
 @cross_origin()
