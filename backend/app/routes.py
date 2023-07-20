@@ -13,7 +13,6 @@ from flask_cors import cross_origin
 from .util.push_to_s3 import push_image_to_s3, push_image_to_s3_with_path
 
 
-
 app.config["JWT_SECRET_KEY"] = "please-remember-to-change-me"
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 
@@ -27,15 +26,6 @@ def home():
     posts = Post.query.all()
     return {"posts": []}
 
-@app.route('/profile/<username>')
-def profile(username):
-    # Logic to fetch and display user profile based on the provided username
-    user = User.query.filter_by(username=username).first()
-    if user is None:
-        return redirect(url_for('home'))
-    return user.json()
-
-
 @app.route('/register', methods=['POST'])
 @cross_origin()
 def register():
@@ -44,15 +34,7 @@ def register():
     username = request.json.get('username')
     password = request.json.get('password')
     bio = request.json.get('bio')
-    
-    print(full_name)
-    print(email)
-    print(username)
-    print(password)
-    print(bio)
 
-
-    # Check if the username or email already exists in the database
     existing_user = User.query.filter(
         (User.username == username) | (User.email == email)
     ).first()
@@ -63,8 +45,6 @@ def register():
         else:
             return jsonify({'message': 'Email already exists'}), 409
 
-    # Create a new user record
-    # password_hash = generate_password_hash(password)
     new_user = User(username=username, full_name=full_name, email=email, password=password, bio=bio)
     print(new_user.id)
     db.session.add(new_user)
@@ -73,28 +53,28 @@ def register():
     return jsonify({'message': 'User registered successfully'}), 201
 
 
-@app.route('/users/<int:user_id>', methods=['GET'])
-def get_user(user_id):
-    user = User.query.get_or_404(user_id)
+# @app.route('/users/<int:user_id>', methods=['GET'])
+# def get_user(user_id):
+#     user = User.query.get_or_404(user_id)
 
-    follower_ids = [follower.follower_id for follower in user.followers]
-    following_ids = [follower.followed_id for follower in user.following]
+#     follower_ids = [follower.follower_id for follower in user.followers]
+#     following_ids = [follower.followed_id for follower in user.following]
 
-    user_data = {
-        'id': user.id,
-        'username': user.username,
-        'email': user.email,
-        'profile_picture': user.profile_picture,
-        'bio': user.bio,
-        'created_at': user.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-        'post_count': len(user.posts),  # user.posts.count(),
-        'follower_count': user.followers.count(),
-        'following_count': user.following.count(),
-        'follower_ids': follower_ids,
-        'following_ids': following_ids
-    }
+#     user_data = {
+#         'id': user.id,
+#         'username': user.username,
+#         'email': user.email,
+#         'profile_picture': user.profile_picture,
+#         'bio': user.bio,
+#         'created_at': user.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+#         'post_count': len(user.posts),  # user.posts.count(),
+#         'follower_count': user.followers.count(),
+#         'following_count': user.following.count(),
+#         'follower_ids': follower_ids,
+#         'following_ids': following_ids
+#     }
 
-    return jsonify(user_data)
+#     return jsonify(user_data)
 
 @app.route('/users', methods=['GET'])
 @cross_origin()
@@ -109,7 +89,6 @@ def get_all_users():
             'id': user.id,
             'username': user.username,
             'email': user.email,
-            # 'profile_picture': user.profile_picture,
             'bio': user.bio,
             'created_at': user.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             'post_count': len(user.posts),  # user.posts.count(),
@@ -120,54 +99,6 @@ def get_all_users():
         }
         user_list.append(user_data)
 
-    dumb_data = [
-        {
-            'id': 18,
-            'username': 'random_username',
-            'email': 'test18@email.com',
-            # 'profile_picture': user.profile_picture,,
-            'bio': 'this is my bio....',
-            # 'created_at': '', #user.created_at.strftime('%Y-%m-%d %H:%M:%S'),,
-            'post_count': 4,
-            'follower_count': 421,
-            'following_count': 150
-        },
-        {
-            'id': 23,
-            'username': 'random_username3',
-            'email': 'test23email.com',
-            # 'profile_picture': user.profile_picture,,
-            'bio': 'this is my bio....',
-            # 'created_at': '', #user.created_at.strftime('%Y-%m-%d %H:%M:%S'),,
-            'post_count': 55,
-            'follower_count': 42,
-            'following_count': 50
-        },
-        {
-            'id': 189,
-            'username': 'random_username5555',
-            'email': 'test555@email.com',
-            # 'profile_picture': user.profile_picture,,
-            'bio': 'this is my bio....',
-            # 'created_at': '', #user.created_at.strftime('%Y-%m-%d %H:%M:%S'),,
-            'post_count': 49,
-            'follower_count': 91,
-            'following_count': 1501
-        },
-        {
-            'id': 1,
-            'username': 'test_user',
-            'email': 'test@test.com',
-            # 'profile_picture': user.profile_picture,,
-            'bio': 'this is my bio ...',
-            # 'created_at': '', #user.created_at.strftime('%Y-%m-%d %H:%M:%S'),,
-            'post_count': 495,
-            'follower_count': 910,
-            'following_count': 15
-        }
-    ]
-
-    # return jsonify(dumb_data)
     return jsonify(user_list)
 
 @app.route('/posts', methods=['GET'])
@@ -200,7 +131,6 @@ def create_post():
     if image_file is None:
         return jsonify({'message': 'No image file provided'}), 400
 
-    # Securely save the uploaded file locally
     filename = secure_filename(image_file.filename)
 
     image_path = 'static/uploads/' + filename
@@ -223,16 +153,12 @@ def get_followers(user_id):
     if not user:
         return jsonify({'error': 'User not found'}), 404
         
-    # Get all Follow entries where the followed_id is the given user_id
     followers = Follow.query.filter_by(followed_id=user_id).all()
 
-    # Get the follower IDs from the retrieved Follow entries
     follower_ids = [follower.follower_id for follower in followers]
 
-    # Query the User table to get the follower information using the follower IDs
     follower_info = User.query.filter(User.id.in_(follower_ids)).all()
 
-    # Prepare the response data
     response_data = [
         {
             'id': follower.id,
@@ -284,19 +210,52 @@ def unfollow_user(current_user_id, user_to_unfollow_id):
 
     return jsonify({'message': 'Successfully unfollowed user'})
 
-@app.route('/token', methods=["POST"])
-@cross_origin()
-def create_token():
-    username = request.json.get("username", None)
-    password = request.json.get("password", None)
-    print(username)
-    print(password)
-    if username != "test" or password != "test123":
-        return {"msg": "Wrong email or password"}, 401
+# @app.route('/token', methods=["POST"])
+# @cross_origin()
+# def create_token():
+#     username = request.json.get("username", None)
+#     password = request.json.get("password", None)
+#     print(username)
+#     print(password)
+#     if username != "test" or password != "test123":
+#         return {"msg": "Wrong email or password"}, 401
 
-    access_token = create_access_token(identity=username)
-    response = {"userId": 1, "token": access_token}
-    return response
+#     access_token = create_access_token(identity=username)
+#     response = {"userId": 1, "token": access_token}
+#     return response
+
+
+@app.route('/users/<int:user_id>', methods=['GET'])
+@cross_origin()
+def get_user(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    user_data = {
+        'id': user.id,
+        'username': user.username,
+        'full_name': user.full_name,
+        'email': user.email,
+        'profile_picture': user.profile_picture,
+        'bio': user.bio,
+        'created_at': user.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+        'post_count': user.posts.count(),
+        'follower_count': user.followers.count(),
+        'following_count': user.following.count(),
+        'posts': [] 
+    }
+        
+    for post in user.posts:
+        post_data = {
+            'id': post.id,
+            'image_url': post.image,
+            'caption': post.caption,
+            'created_at': post.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        }
+        user_data['posts'].append(post_data)
+
+    return jsonify(user_data)
 
 
 @app.route('/login', methods=['POST'])
@@ -305,17 +264,13 @@ def login():
     username = request.json.get('username')
     password = request.json.get('password')
 
-    # Retrieve the user from the database based on the provided username
     user = User.query.filter_by(username=username).first()
 
     if user and check_password_hash(user.password_hash, password):
-        # If the provided password matches the stored hash, generate an access token
         access_token = create_access_token(identity=user.username)
 
-        # Return the access token as the response
         return jsonify({'userId': user.id, 'token': access_token}), 200
     else:
-        # If the credentials are invalid, return an error message
         return jsonify({'message': 'Invalid username or password'}), 401
 
 @app.route("/logout", methods=["POST"])
