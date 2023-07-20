@@ -14,7 +14,7 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
         const resData = await sendRequest(
-          `http://localhost:8000/profiles/${userId}`,
+          `http://localhost:8000/users/${userId}`,
           "GET",
         )
       console.log(resData)

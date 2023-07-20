@@ -42,19 +42,28 @@ const ProfileItem = (props) => {
     <>
       <h1>Profile</h1>
       <div className="profile__item">
-        <h3 className="profile__item__firstName">{props.item.profile?.username}</h3>
+        <h3 className="profile__item__firstName">{props.item.fullName}</h3>
         <div className="profile__item__info">
-          <p className="profile__item__firstName">
-            First name: {props.item.profile?.firstName}
-          </p>
-          <p className="profile__item__lastName">
-            Last name: {props.item.profile?.lastName}
-          </p>
-          <p className="profile__item__phoneNumber">
-            Phone number: {props.item.profile?.phoneNumber}
+          <p className="profile__item__email">
+            Full Name: {props.item?.full_name}
           </p>
           <p className="profile__item__email">
-            Email: {props.item.profile?.email}
+            username: {props.item?.username}
+          </p>
+          <p className="profile__item__email">
+            email: {props.item?.email}
+          </p>
+          <p className="profile__item__email">
+            bio: {props.item?.bio}
+          </p>
+          <p className="profile__item__email">
+            post count: {props.item?.post_count}
+          </p>
+          <p className="profile__item__email">
+            followers: {props.item?.follower_count}
+          </p>
+          <p className="profile__item__email">
+            following: {props.item?.following_count}
           </p>
           
         </div>
@@ -65,18 +74,18 @@ const ProfileItem = (props) => {
               Update
             </Button>)
           }
-          {
+          {/* {
             (auth.userId === id) &&
             (<Button info onClick={AddPost}>
               New Post
             </Button>
             )
-          }
+          } */}
           <p></p>
           {
             (auth.userId !== id) &&(
             <Button info onClick={ViewPosts}>
-              Users Posts
+              User Posts
             </Button>
             )
           }

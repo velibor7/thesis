@@ -5,8 +5,8 @@ from flask import redirect, url_for, request, jsonify
 from app import app, db
 from app.models import User, Post, Like, Follow
 from werkzeug.utils import secure_filename
-from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, \
-                               unset_jwt_cookies, jwt_required, JWTManager
+from flask_jwt_extended import create_access_token, get_jwt, get_jwt_identity, \
+    unset_jwt_cookies, jwt_required, JWTManager
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_cors import cross_origin
 
@@ -26,55 +26,44 @@ def home():
     posts = Post.query.all()
     return {"posts": []}
 
-@app.route('/register', methods=['POST'])
+
+@app.route('/users/<int:user_id>', methods=['GET'])
 @cross_origin()
-def register():
-    full_name = request.json.get('full_name')
-    email = request.json.get('email')
-    username = request.json.get('username')
-    password = request.json.get('password')
-    bio = request.json.get('bio')
+def get_user(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
 
-    existing_user = User.query.filter(
-        (User.username == username) | (User.email == email)
-    ).first()
+    follower_ids = [follower.follower_id for follower in user.followers]
+    following_ids = [follower.followed_id for follower in user.following]
 
-    if existing_user:
-        if existing_user.username == username:
-            return jsonify({'message': 'Username already exists'}), 409
-        else:
-            return jsonify({'message': 'Email already exists'}), 409
+    user_data = {
+        'id': user.id,
+        'username': user.username,
+        'full_name': user.full_name,
+        'email': user.email,
+        'profile_picture': user.profile_picture,
+        'bio': user.bio,
+        'created_at': user.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+        'post_count': len(user.posts),  # user.posts.count(),
+        'follower_count': user.followers.count(),
+        'following_count': user.following.count(),
+        'follower_ids': follower_ids,
+        'following_ids': following_ids,
+        'posts': []
+    }
 
-    new_user = User(username=username, full_name=full_name, email=email, password=password, bio=bio)
-    print(new_user.id)
-    db.session.add(new_user)
-    db.session.commit()
+    for post in user.posts:
+        post_data = {
+            'id': post.id,
+            'image_url': post.image_url,
+            'content': post.content,
+            # 'created_at': post.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        }
+        user_data['posts'].append(post_data)
 
-    return jsonify({'message': 'User registered successfully'}), 201
+    return jsonify(user_data)
 
-
-# @app.route('/users/<int:user_id>', methods=['GET'])
-# def get_user(user_id):
-#     user = User.query.get_or_404(user_id)
-
-#     follower_ids = [follower.follower_id for follower in user.followers]
-#     following_ids = [follower.followed_id for follower in user.following]
-
-#     user_data = {
-#         'id': user.id,
-#         'username': user.username,
-#         'email': user.email,
-#         'profile_picture': user.profile_picture,
-#         'bio': user.bio,
-#         'created_at': user.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-#         'post_count': len(user.posts),  # user.posts.count(),
-#         'follower_count': user.followers.count(),
-#         'following_count': user.following.count(),
-#         'follower_ids': follower_ids,
-#         'following_ids': following_ids
-#     }
-
-#     return jsonify(user_data)
 
 @app.route('/users', methods=['GET'])
 @cross_origin()
@@ -101,6 +90,7 @@ def get_all_users():
 
     return jsonify(user_list)
 
+
 @app.route('/posts', methods=['GET'])
 @cross_origin()
 def get_all_posts():
@@ -119,6 +109,7 @@ def get_all_posts():
         print(f"post id: {post.id}; image_url: {post.image_url}")
 
     return jsonify(post_list)
+
 
 @app.route('/posts', methods=['POST'])
 @cross_origin()
@@ -146,13 +137,14 @@ def create_post():
 
     return jsonify({'message': 'Post created successfully'}), 201
 
+
 @app.route('/users/<int:user_id>/followers', methods=['GET'])
 @cross_origin()
 def get_followers(user_id):
     user = User.query.get(user_id)
     if not user:
         return jsonify({'error': 'User not found'}), 404
-        
+
     followers = Follow.query.filter_by(followed_id=user_id).all()
 
     follower_ids = [follower.follower_id for follower in followers]
@@ -170,6 +162,7 @@ def get_followers(user_id):
 
     return jsonify({'followers': response_data})
 
+
 @app.route('/users/<int:current_user_id>/<int:user_to_follow_id>/follow', methods=['POST'])
 @cross_origin()
 def follow_user(current_user_id, user_to_follow_id):
@@ -180,7 +173,8 @@ def follow_user(current_user_id, user_to_follow_id):
         return jsonify({'message': 'Cannot follow yourself'})
 
     # Check if the current user is already following the target user
-    existing_follow = Follow.query.filter_by(follower_id=current_user_id, followed_id=user_to_follow_id).first()
+    existing_follow = Follow.query.filter_by(
+        follower_id=current_user_id, followed_id=user_to_follow_id).first()
 
     if existing_follow:
         return jsonify({'message': 'Already following this user'})
@@ -191,6 +185,7 @@ def follow_user(current_user_id, user_to_follow_id):
 
     return jsonify({'message': 'Successfully followed user'})
 
+
 @app.route('/users/<int:current_user_id>/<int:user_to_unfollow_id>/unfollow', methods=['POST'])
 @cross_origin()
 def unfollow_user(current_user_id, user_to_unfollow_id):
@@ -200,7 +195,8 @@ def unfollow_user(current_user_id, user_to_unfollow_id):
     if current_user_id == user_to_unfollow_id:
         return jsonify({'message': 'Cannot unfollow yourself'})
 
-    follow = Follow.query.filter_by(follower_id=current_user_id, followed_id=user_to_unfollow_id).first()
+    follow = Follow.query.filter_by(
+        follower_id=current_user_id, followed_id=user_to_unfollow_id).first()
 
     if not follow:
         return jsonify({'message': 'Not following this user'})
@@ -210,52 +206,33 @@ def unfollow_user(current_user_id, user_to_unfollow_id):
 
     return jsonify({'message': 'Successfully unfollowed user'})
 
-# @app.route('/token', methods=["POST"])
-# @cross_origin()
-# def create_token():
-#     username = request.json.get("username", None)
-#     password = request.json.get("password", None)
-#     print(username)
-#     print(password)
-#     if username != "test" or password != "test123":
-#         return {"msg": "Wrong email or password"}, 401
 
-#     access_token = create_access_token(identity=username)
-#     response = {"userId": 1, "token": access_token}
-#     return response
-
-
-@app.route('/users/<int:user_id>', methods=['GET'])
+@app.route('/register', methods=['POST'])
 @cross_origin()
-def get_user(user_id):
-    user = User.query.get(user_id)
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
+def register():
+    full_name = request.json.get('full_name')
+    email = request.json.get('email')
+    username = request.json.get('username')
+    password = request.json.get('password')
+    bio = request.json.get('bio')
 
-    user_data = {
-        'id': user.id,
-        'username': user.username,
-        'full_name': user.full_name,
-        'email': user.email,
-        'profile_picture': user.profile_picture,
-        'bio': user.bio,
-        'created_at': user.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-        'post_count': user.posts.count(),
-        'follower_count': user.followers.count(),
-        'following_count': user.following.count(),
-        'posts': [] 
-    }
-        
-    for post in user.posts:
-        post_data = {
-            'id': post.id,
-            'image_url': post.image,
-            'caption': post.caption,
-            'created_at': post.created_at.strftime('%Y-%m-%d %H:%M:%S')
-        }
-        user_data['posts'].append(post_data)
+    existing_user = User.query.filter(
+        (User.username == username) | (User.email == email)
+    ).first()
 
-    return jsonify(user_data)
+    if existing_user:
+        if existing_user.username == username:
+            return jsonify({'message': 'Username already exists'}), 409
+        else:
+            return jsonify({'message': 'Email already exists'}), 409
+
+    new_user = User(username=username, full_name=full_name,
+                    email=email, password=password, bio=bio)
+    print(new_user.id)
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({'message': 'User registered successfully'}), 201
 
 
 @app.route('/login', methods=['POST'])
@@ -272,6 +249,7 @@ def login():
         return jsonify({'userId': user.id, 'token': access_token}), 200
     else:
         return jsonify({'message': 'Invalid username or password'}), 401
+
 
 @app.route("/logout", methods=["POST"])
 @cross_origin()
@@ -291,10 +269,9 @@ def refresh_expiring_jwts(response):
             access_token = create_access_token(identity=get_jwt_identity())
             data = response.get_json()
             if type(data) is dict:
-                data["access_token"] = access_token 
+                data["access_token"] = access_token
                 response.data = json.dumps(data)
         return response
     except (RuntimeError, KeyError):
         # Case where there is not a valid JWT. Just return the original respone
         return response
-

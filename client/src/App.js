@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, BrowserRouter as Router, Route } from "react-router-dom";
 
-// import UserProfile from "./users/pages/Profile";
+import UserProfile from "./users/pages/Profile";
 import AllProfiles from "./users/pages/AllProfiles";
 
 // import Post from "./posts/pages/Post"
@@ -40,8 +40,9 @@ const App = () => {
       <Router>
         <MainNavigation />
         <Routes>
-          {/* <Route path="/profiles/:userId/" element={<UserProfile/>}/>
+          {/* 
           <Route path="/profiles/:userId/update" element={<UpdateProfile/>}/> */}
+          <Route path="/profiles/:userId/" element={<UserProfile/>}/>
           <Route path="/" exact="true" element={<AllPosts />} />
           <Route path="/auth" exact="true" element={<Auth />} />
           <Route path="/newpost" element={<NewPost/>}/>
