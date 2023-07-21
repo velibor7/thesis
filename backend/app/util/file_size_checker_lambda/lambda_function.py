@@ -15,7 +15,7 @@ def lambda_handler(event, context):
     response = s3_client.head_object(Bucket=bucket, Key=key)
     file_size = response['ContentLength']
 
-    threshold_size = 10 * 1024 * 1024  # 10 MB
+    threshold_size = 1024 * 1024 * 10 # 10 MB
     if file_size > threshold_size:
         response = s3_client.get_object(Bucket=bucket, Key=key)
         image_data = response['Body'].read()
