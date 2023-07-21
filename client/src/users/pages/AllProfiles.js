@@ -49,8 +49,8 @@ const AllProfiles = () => {
           .then((response) => response.json())
           .then((data) => {
             console.log(data);
-            setCurrentUser(data);
-            setCurrentUserFollowing(data.following_ids);
+            setCurrentUser(data['user_data']);
+            setCurrentUserFollowing(data['user_data'].following_ids);
             console.log("currentUserFollowing: ")
             console.log(currentUserFollowing)
           });

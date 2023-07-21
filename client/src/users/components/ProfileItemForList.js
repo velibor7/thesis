@@ -13,9 +13,9 @@ const ProfileItemForList = (props) => {
   const [followingIds, setFollowingIds] = useState([]);
   const notFollowing = false;
 
-  useEffect(() => {
-    setFollowingIds(props?.currentUserFollowing);
-  }, []);
+  // useEffect(() => {
+  //   setFollowingIds(props?.currentUserFollowing);
+  // }, []);
 
   const followUser = async (user_to_follow) => {
     if (!auth.userId) {
@@ -98,7 +98,7 @@ const ProfileItemForList = (props) => {
         {auth.userId && (
           <div className="profile-item__actions">
             {/* {!followingIds.includes(props?.item.id) ? ( */}
-            {!props?.currentUserFollowing.includes(props?.item.id) ? (
+            {!props?.currentUserFollowing.includes(props?.item?.id) ? (
               <Button info onClick={() => followUser(props?.item.id)}>
                 Follow
               </Button>
