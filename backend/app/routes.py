@@ -62,7 +62,7 @@ def get_user(user_id):
         }
         user_data['posts'].append(post_data)
 
-    return jsonify(user_data)
+    return jsonify({"user_data": user_data})
 
 
 @app.route('/users', methods=['GET'])
