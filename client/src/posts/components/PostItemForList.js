@@ -5,7 +5,7 @@ import { AuthContext } from "../../shared/context/auth-context";
 import Button from "../../shared/components/FormElements/Button";
 
 
-const PostItemForList = (props) => {
+const PostItem = (props) => {
   
   const auth = useContext(AuthContext);
   return (
